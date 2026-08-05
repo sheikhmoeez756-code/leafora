@@ -1,26 +1,187 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@theme {
+  /* Leafora palette — deep forest greens, cream, soft gold */
+  --color-forest-950: #0c1410;
+  --color-forest-900: #131f19;
+  --color-forest-850: #182720;
+  --color-forest-800: #1e3027;
+  --color-forest-700: #2a4234;
+  --color-forest-600: #3a5847;
+  --color-forest-500: #4f7260;
+  --color-sage-400: #7e9c88;
+  --color-sage-300: #a3bdac;
+  --color-sage-200: #c5d8cc;
+  --color-cream-50: #f4f1e6;
+  --color-cream-100: #eae6d6;
+  --color-cream-200: #ddd7c2;
+  --color-gold-300: #e3d6a6;
+  --color-gold-400: #cfc08a;
+  --color-gold-500: #b5a568;
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --font-display: var(--font-marcellus), Georgia, serif;
+  --font-sans: var(--font-inter), system-ui, sans-serif;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --radius-card: 1.5rem;
+  --radius-pill: 999px;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--color-forest-950);
+  color: var(--color-cream-50);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Frosted glass panel — the core Leafora surface */
+.glass {
+  background: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 0.09),
+    rgba(255, 255, 255, 0.04)
+  );
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.glass-deep {
+  background: linear-gradient(
+    145deg,
+    rgba(19, 31, 25, 0.72),
+    rgba(19, 31, 25, 0.5)
+  );
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.text-display {
+  font-family: var(--font-display);
+  letter-spacing: 0.01em;
+}
+
+/* Soft vignette over background photography */
+.bg-veil::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(120% 90% at 50% 0%, rgba(12, 20, 16, 0.25) 0%, rgba(12, 20, 16, 0.78) 78%),
+    linear-gradient(rgba(12, 20, 16, 0.35), rgba(12, 20, 16, 0.9));
+  pointer-events: none;
+  z-index: -1;
+}
+
+::selection {
+  background: var(--color-gold-400);
+  color: var(--color-forest-950);
+}
+
+/* ---------- Motion ---------- */
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes bloom {
+  from {
+    opacity: 0;
+    transform: scale(0.94) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-7px);
+  }
+}
+
+@keyframes drift {
+  from {
+    transform: scale(1.1) translate(0, 0);
+  }
+  to {
+    transform: scale(1.18) translate(-1.5%, -2%);
+  }
+}
+
+@keyframes pop {
+  0% {
+    transform: scale(1);
+  }
+  45% {
+    transform: scale(1.25);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Entrance: fade-up. Set --d to delay. */
+.anim-rise {
+  animation: rise 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: var(--d, 0s);
+}
+
+/* Entrance: soft scale-in for hero cards / images. */
+.anim-bloom {
+  animation: bloom 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: var(--d, 0s);
+}
+
+/* Each direct child fades up in sequence — for grids and lists. */
+.anim-stagger > * {
+  animation: rise 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.anim-stagger > *:nth-child(1) { animation-delay: 0.05s; }
+.anim-stagger > *:nth-child(2) { animation-delay: 0.1s; }
+.anim-stagger > *:nth-child(3) { animation-delay: 0.15s; }
+.anim-stagger > *:nth-child(4) { animation-delay: 0.2s; }
+.anim-stagger > *:nth-child(5) { animation-delay: 0.25s; }
+.anim-stagger > *:nth-child(6) { animation-delay: 0.3s; }
+.anim-stagger > *:nth-child(7) { animation-delay: 0.35s; }
+.anim-stagger > *:nth-child(8) { animation-delay: 0.4s; }
+.anim-stagger > *:nth-child(9) { animation-delay: 0.45s; }
+.anim-stagger > *:nth-child(n + 10) { animation-delay: 0.5s; }
+
+/* Gentle idle hover for the logo mark. */
+.anim-float {
+  animation: float 5.5s ease-in-out infinite;
+}
+
+/* Slow Ken Burns on background photography. */
+.anim-drift {
+  animation: drift 45s ease-in-out infinite alternate;
+}
+
+/* Feedback pulse — re-triggered by remounting with a changing key. */
+.anim-pop {
+  animation: pop 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .anim-rise,
+  .anim-bloom,
+  .anim-stagger > *,
+  .anim-float,
+  .anim-drift,
+  .anim-pop {
+    animation: none;
+  }
 }
