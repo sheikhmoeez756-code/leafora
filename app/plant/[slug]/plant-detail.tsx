@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { formatPrice, type Product } from "@/lib/products";
 import { useCart } from "@/lib/cart-context";
+import { useWishlist } from "@/lib/wishlist-context";
 import { TopNav } from "@/components/nav";
 import { Backdrop } from "@/components/backdrop";
 import { PillButton } from "@/components/ui";
@@ -44,13 +45,24 @@ function CareStat({
 export function PlantDetail({ product }: { product: Product }) {
   const router = useRouter();
   const { add } = useCart();
+  const wishlist = useWishlist();
   const [added, setAdded] = useState(false);
-  const [liked, setLiked] = useState(false);
+  const liked = wishlist.has(product.slug);
+
+  const resetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(
+    () => () => {
+      if (resetTimer.current) clearTimeout(resetTimer.current);
+    },
+    []
+  );
 
   function handleAdd() {
     add(product.slug);
     setAdded(true);
-    setTimeout(() => setAdded(false), 1500);
+    if (resetTimer.current) clearTimeout(resetTimer.current);
+    resetTimer.current = setTimeout(() => setAdded(false), 1500);
   }
 
   return (
@@ -80,8 +92,13 @@ export function PlantDetail({ product }: { product: Product }) {
             <ArrowLeftIcon width={18} height={18} />
           </button>
           <button
-            aria-label="Add to wishlist"
-            onClick={() => setLiked(!liked)}
+            aria-label={
+              liked
+                ? `Remove ${product.name} from wishlist`
+                : `Add ${product.name} to wishlist`
+            }
+            aria-pressed={liked}
+            onClick={() => wishlist.toggle(product.slug)}
             className={`glass-deep absolute top-4 right-4 rounded-full p-2.5 transition hover:bg-white/10 ${
               liked ? "text-gold-300" : ""
             }`}

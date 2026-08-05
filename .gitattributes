@@ -1,0 +1,12 @@
+# Normalize to LF in the repository; Git still checks out the platform's
+# native endings. Without this, editing on Windows shows whole files as
+# changed purely because of CRLF.
+* text=auto eol=lf
+
+# Binary assets Git must never touch
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.avif binary
+*.ico binary

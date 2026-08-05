@@ -5,26 +5,31 @@ import Image from "next/image";
 import Link from "next/link";
 import { CATEGORIES, PRODUCTS, type Category } from "@/lib/products";
 import { ProductCard } from "@/components/product-card";
-import { BottomNav, TopNav } from "@/components/nav";
+import { BottomNav, CartBadge, TopNav } from "@/components/nav";
 import { Backdrop } from "@/components/backdrop";
 import { PillLink } from "@/components/ui";
 import { CartIcon, LeafIcon, SearchIcon } from "@/components/icons";
-import { useCart } from "@/lib/cart-context";
 
 export default function ShopPage() {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<Category | "all">("all");
-  const { count } = useCart();
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     return PRODUCTS.filter((p) => {
       const inCategory =
         category === "all" || p.categories.includes(category as Category);
+      // Match the category labels too, so "low light" / "pet friendly" find
+      // something instead of returning the empty state.
+      const labels = p.categories
+        .map((c) => CATEGORIES.find((x) => x.key === c)?.label ?? "")
+        .join(" ")
+        .toLowerCase();
       const matches =
         !q ||
         p.name.toLowerCase().includes(q) ||
-        p.latin.toLowerCase().includes(q);
+        p.latin.toLowerCase().includes(q) ||
+        labels.includes(q);
       return inCategory && matches;
     });
   }, [query, category]);
@@ -46,23 +51,18 @@ export default function ShopPage() {
           </span>
           <Link href="/cart" aria-label="Cart" className="glass relative rounded-full p-2.5">
             <CartIcon width={19} height={19} />
-            {count > 0 && (
-              <span
-                key={count}
-                className="anim-pop absolute -top-1 -right-1 flex h-4.5 min-w-4.5 items-center justify-center rounded-full bg-gold-400 px-1 text-[10px] font-semibold text-forest-950"
-              >
-                {count}
-              </span>
-            )}
+            <CartBadge className="-top-1 -right-1" />
           </Link>
         </header>
 
         {/* Search */}
-        <div className="anim-rise glass flex items-center gap-3 rounded-full px-5 py-3 [--d:0.08s] md:mt-2">
+        <div className="anim-rise glass flex items-center gap-3 rounded-full px-5 py-3 [--d:0.08s] focus-within:border-gold-400/60 md:mt-2">
           <SearchIcon width={18} height={18} className="shrink-0 text-sage-300" />
           <input
+            type="search"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
+            aria-label="Search plants and pots"
             placeholder="Search plants, pots…"
             className="w-full bg-transparent text-sm outline-none placeholder:text-sage-400"
           />
@@ -102,6 +102,7 @@ export default function ShopPage() {
               <button
                 key={key}
                 onClick={() => setCategory(key)}
+                aria-pressed={active}
                 className={`shrink-0 rounded-full px-4 py-2 text-xs transition md:text-sm ${
                   active
                     ? "bg-cream-50 font-medium text-forest-900"
@@ -119,12 +120,12 @@ export default function ShopPage() {
           <section className="mt-7">
             <div className="mb-3 flex items-baseline justify-between">
               <h3 className="text-display text-xl">Best Sellers</h3>
-              <button
-                onClick={() => setCategory("indoor")}
+              <Link
+                href="#plants"
                 className="text-xs text-gold-300 hover:text-gold-400"
               >
                 View All
-              </button>
+              </Link>
             </div>
             <div className="anim-stagger grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-5 lg:grid-cols-4">
               {bestSellers.map((p) => (

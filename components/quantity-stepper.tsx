@@ -16,9 +16,12 @@ export function QuantityStepper({
   }`;
   return (
     <div className="flex items-center gap-2.5">
+      {/* Stops at 1 — dropping to 0 silently deleted the line item, which the
+          "Decrease quantity" label gave no warning of. Removal is the bin. */}
       <button
         aria-label="Decrease quantity"
-        className={btn}
+        className={`${btn} disabled:opacity-40`}
+        disabled={qty <= 1}
         onClick={() => onChange(qty - 1)}
       >
         <MinusIcon width={14} height={14} />

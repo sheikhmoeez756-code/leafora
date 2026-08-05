@@ -4,11 +4,12 @@ import Image from "next/image";
 export function Backdrop() {
   return (
     <div className="fixed inset-0 -z-10" aria-hidden>
+      {/* Deliberately not `priority`: it's decorative, and preloading it
+          competes with the real LCP image on every page. */}
       <Image
         src="/bg/leaves.jpg"
         alt=""
         fill
-        priority
         sizes="100vw"
         className="anim-drift scale-110 object-cover blur-md"
       />

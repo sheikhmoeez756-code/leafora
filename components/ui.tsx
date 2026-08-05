@@ -4,17 +4,11 @@ import type { ReactNode, ButtonHTMLAttributes } from "react";
 export function GlassCard({
   children,
   className = "",
-  deep = false,
 }: {
   children: ReactNode;
   className?: string;
-  deep?: boolean;
 }) {
-  return (
-    <div className={`${deep ? "glass-deep" : "glass"} rounded-3xl ${className}`}>
-      {children}
-    </div>
-  );
+  return <div className={`glass rounded-3xl ${className}`}>{children}</div>;
 }
 
 const pillBase =

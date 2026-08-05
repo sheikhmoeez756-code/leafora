@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { formatPrice, getProduct } from "@/lib/products";
-import { useCart } from "@/lib/cart-context";
+import { promoRate, useCart } from "@/lib/cart-context";
 import { BottomNav, TopNav } from "@/components/nav";
 import { Backdrop } from "@/components/backdrop";
 import { GlassCard, PillLink } from "@/components/ui";
@@ -115,7 +115,11 @@ export default function CartPage() {
             <div className="anim-rise mt-6 space-y-4 [--d:0.2s] md:mt-0">
               <GlassCard className="p-4">
                 <div className="flex gap-2">
+                  <label htmlFor="promo-code" className="sr-only">
+                    Promo code
+                  </label>
                   <input
+                    id="promo-code"
                     value={code}
                     onChange={(e) => {
                       setCode(e.target.value);
@@ -123,7 +127,8 @@ export default function CartPage() {
                     }}
                     onKeyDown={(e) => e.key === "Enter" && applyPromo()}
                     placeholder="Promo Code"
-                    className="glass w-full rounded-full px-4 py-2.5 text-sm outline-none placeholder:text-sage-400"
+                    aria-invalid={promoState === "bad"}
+                    className="glass w-full rounded-full px-4 py-2.5 text-sm outline-none placeholder:text-sage-400 focus:border-gold-400/60"
                   />
                   <button
                     onClick={applyPromo}
@@ -132,17 +137,19 @@ export default function CartPage() {
                     Apply
                   </button>
                 </div>
-                {cart.promo && (
-                  <p className="flex items-center gap-1.5 pt-2.5 pl-2 text-xs text-gold-300">
-                    <CheckIcon width={13} height={13} /> {cart.promo} applied —
-                    10% off
-                  </p>
-                )}
-                {promoState === "bad" && (
-                  <p className="pt-2.5 pl-2 text-xs text-red-300">
-                    That code isn&apos;t valid. Psst — try LEAF10.
-                  </p>
-                )}
+                <div role="status" aria-live="polite">
+                  {cart.promo && (
+                    <p className="flex items-center gap-1.5 pt-2.5 pl-2 text-xs text-gold-300">
+                      <CheckIcon width={13} height={13} /> {cart.promo} applied —{" "}
+                      {Math.round(promoRate(cart.promo) * 100)}% off
+                    </p>
+                  )}
+                  {promoState === "bad" && (
+                    <p className="pt-2.5 pl-2 text-xs text-red-300">
+                      That code isn&apos;t valid. Psst — try LEAF10.
+                    </p>
+                  )}
+                </div>
               </GlassCard>
 
               <GlassCard className="space-y-2.5 p-5 text-sm">
