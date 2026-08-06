@@ -57,6 +57,17 @@ export function CartProvider({ children }: { children: ReactNode }) {
     dispatch({ type: "hydrate", state: parseStoredCart(raw) });
   }, []);
 
+  // Another tab changed the cart. `storage` only fires in *other* tabs, so
+  // this can't loop against our own writes below.
+  useEffect(() => {
+    function onStorage(e: StorageEvent) {
+      if (e.key !== STORAGE_KEY) return;
+      dispatch({ type: "hydrate", state: parseStoredCart(e.newValue) });
+    }
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, []);
+
   useEffect(() => {
     if (!state.hydrated) return; // never write over a saved cart with the empty default
     try {

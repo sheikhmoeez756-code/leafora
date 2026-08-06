@@ -4,7 +4,15 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { CATEGORIES, PRODUCTS, type Category } from "@/lib/products";
+import {
+  CATEGORIES,
+  PRODUCTS,
+  SORTS,
+  isSortKey,
+  sortProducts,
+  type Category,
+  type SortKey,
+} from "@/lib/products";
 import { ProductCard } from "@/components/product-card";
 import { BottomNav, CartBadge, TopNav } from "@/components/nav";
 import { Backdrop } from "@/components/backdrop";
@@ -57,6 +65,7 @@ export function ShopBrowser() {
     ? (params.get("c") as Category | "all")
     : "all";
   const urlQuery = params.get("q") ?? "";
+  const sort: SortKey = isSortKey(params.get("sort")) ? (params.get("sort") as SortKey) : "featured";
 
   // The input stays local so typing never waits on a navigation; the URL
   // catches up shortly after.
@@ -75,16 +84,19 @@ export function ShopBrowser() {
    *  it goes into history. Typing is debounced and continuous — pushing there
    *  would bury the previous page under one entry per keystroke. */
   function writeParams(
-    next: { q?: string; c?: Category | "all" },
+    next: { q?: string; c?: Category | "all"; sort?: SortKey },
     history: "push" | "replace"
   ) {
     const sp = new URLSearchParams(params.toString());
     const q = next.q ?? query;
     const c = next.c ?? category;
+    const s = next.sort ?? sort;
     if (q.trim()) sp.set("q", q.trim());
     else sp.delete("q");
     if (c !== "all") sp.set("c", c);
     else sp.delete("c");
+    if (s !== "featured") sp.set("sort", s);
+    else sp.delete("sort");
     const search = sp.toString();
     lastPushed.current = q.trim();
     const url = search ? `${pathname}?${search}` : pathname;
@@ -102,7 +114,7 @@ export function ShopBrowser() {
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return PRODUCTS.filter((p) => {
+    const base = PRODUCTS.filter((p) => {
       const inCategory =
         category === "all" || p.categories.includes(category as Category);
       // Match the category labels too, so "low light" / "pet friendly" find
@@ -118,17 +130,20 @@ export function ShopBrowser() {
         labels.includes(q);
       return inCategory && matches;
     });
-  }, [query, category]);
+    return sortProducts(base, sort);
+  }, [query, category, sort]);
 
   const bestSellers = filtered.filter((p) => p.bestseller);
   const rest = filtered.filter((p) => !p.bestseller);
-  const showSections = !query && category === "all";
+  // Splitting into Best Sellers / Our Collection only makes sense in the
+  // curated order — once the shopper sorts by price, one flat list is honest.
+  const showSections = !query && category === "all" && sort === "featured";
 
   return (
     <>
       <Backdrop />
       <TopNav />
-      <main className="mx-auto max-w-5xl px-4 pt-5 pb-28 md:pt-8 md:pb-16">
+      <main id="main" className="mx-auto max-w-5xl px-4 pt-5 pb-28 md:pt-8 md:pb-16">
         {/* Mobile header */}
         <header className="anim-rise mb-5 flex items-center justify-between md:hidden">
           <span className="flex items-center gap-2">
@@ -180,8 +195,32 @@ export function ShopBrowser() {
           </div>
         </section>
 
+        {/* Sort */}
+        <div className="anim-rise mt-6 flex items-center justify-between gap-4 [--d:0.22s]">
+          <p className="text-xs text-sage-400" aria-live="polite">
+            {filtered.length} {filtered.length === 1 ? "plant" : "plants"}
+          </p>
+          <span className="flex items-center gap-2">
+            <label htmlFor="sort" className="text-xs text-sage-400">
+              Sort
+            </label>
+            <select
+              id="sort"
+              value={sort}
+              onChange={(e) => writeParams({ sort: e.target.value as SortKey }, "push")}
+              className="glass rounded-full px-3.5 py-2 text-xs text-cream-50 outline-none focus:border-gold-400/60 md:text-sm"
+            >
+              {SORTS.map((s) => (
+                <option key={s.key} value={s.key} className="bg-forest-900 text-cream-50">
+                  {s.label}
+                </option>
+              ))}
+            </select>
+          </span>
+        </div>
+
         {/* Category chips */}
-        <div className="anim-rise scrollbar-none -mx-4 mt-6 flex gap-2.5 overflow-x-auto px-4 pb-1 [--d:0.25s] md:mx-0 md:px-0">
+        <div className="anim-rise scrollbar-none -mx-4 mt-4 flex gap-2.5 overflow-x-auto px-4 pb-1 [--d:0.25s] md:mx-0 md:px-0">
           {CATEGORIES.map(({ key, label }) => {
             const active = category === key;
             return (
@@ -230,7 +269,7 @@ export function ShopBrowser() {
               <button
                 onClick={() => {
                   setQuery("");
-                  writeParams({ q: "", c: "all" }, "push");
+                  writeParams({ q: "", c: "all", sort: "featured" }, "push");
                 }}
                 className="mt-4 block w-full text-xs text-gold-300 hover:text-gold-400"
               >

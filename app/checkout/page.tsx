@@ -54,7 +54,7 @@ export default function CheckoutPage() {
 
   if (placed) {
     return (
-      <main className="flex min-h-dvh items-center justify-center p-5">
+      <main id="main" className="flex min-h-dvh items-center justify-center p-5">
         <Backdrop />
         <GlassCard className="anim-bloom w-full max-w-md p-10 text-center">
           <div className="anim-pop glass mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full text-gold-300">
@@ -76,7 +76,7 @@ export default function CheckoutPage() {
 
   if (cart.items.length === 0) {
     return (
-      <main className="flex min-h-dvh items-center justify-center p-5">
+      <main id="main" className="flex min-h-dvh items-center justify-center p-5">
         <Backdrop />
         <GlassCard className="w-full max-w-md p-10 text-center">
           <LeafIcon width={32} height={32} className="mx-auto text-sage-400" />
@@ -95,7 +95,7 @@ export default function CheckoutPage() {
     <>
       <Backdrop />
       <TopNav />
-      <main className="mx-auto max-w-5xl px-4 pt-5 pb-28 md:pt-10 md:pb-16">
+      <main id="main" className="mx-auto max-w-5xl px-4 pt-5 pb-28 md:pt-10 md:pb-16">
         <header className="mb-6 flex items-center justify-between md:hidden">
           <button
             aria-label="Back"

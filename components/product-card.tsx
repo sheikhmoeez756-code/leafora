@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { formatPrice, type Product } from "@/lib/products";
+import { blurProps } from "@/lib/blur-data";
 import { useCart } from "@/lib/cart-context";
 import { useWishlist } from "@/lib/wishlist-context";
 import { HeartIcon, PlusIcon, StarIcon } from "@/components/icons";
@@ -22,6 +23,7 @@ export function ProductCard({ product }: { product: Product }) {
             src={product.image}
             alt={product.name}
             fill
+            {...blurProps(product.image)}
             sizes="(max-width: 768px) 50vw, 25vw"
             className="object-cover transition-transform duration-300 group-hover:scale-105"
           />

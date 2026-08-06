@@ -66,6 +66,34 @@ body {
   color: var(--color-forest-950);
 }
 
+/* One focus treatment for everything. Declared after the Tailwind import so it
+   beats `outline-none` utilities, which would otherwise leave keyboard users
+   with no visible focus at all. :focus-visible keeps it off mouse clicks. */
+:focus-visible {
+  outline: 2px solid var(--color-gold-400);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* Skip link: off-screen until focused, then pinned to the top-left. */
+.skip-link {
+  position: fixed;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 100;
+  padding: 0.65rem 1.1rem;
+  border-radius: 999px;
+  background: var(--color-cream-50);
+  color: var(--color-forest-900);
+  font-size: 0.85rem;
+  font-weight: 500;
+  transform: translateY(-150%);
+  transition: transform 0.2s ease;
+}
+.skip-link:focus-visible {
+  transform: translateY(0);
+}
+
 /* ---------- Motion ---------- */
 
 @keyframes rise {

@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { formatPrice, relatedProducts, type Product } from "@/lib/products";
+import { blurProps } from "@/lib/blur-data";
 import { useCart } from "@/lib/cart-context";
 import { useWishlist } from "@/lib/wishlist-context";
 import { TopNav } from "@/components/nav";
@@ -12,6 +13,7 @@ import { Backdrop } from "@/components/backdrop";
 import { Footer } from "@/components/footer";
 import { ProductCard } from "@/components/product-card";
 import { StarRating } from "@/components/star-rating";
+import { QuantityStepper } from "@/components/quantity-stepper";
 import { PillButton } from "@/components/ui";
 import {
   ArrowLeftIcon,
@@ -51,6 +53,7 @@ export function PlantDetail({ product }: { product: Product }) {
   const { add } = useCart();
   const wishlist = useWishlist();
   const [added, setAdded] = useState(false);
+  const [qty, setQty] = useState(1);
   const liked = wishlist.has(product.slug);
   const related = relatedProducts(product.slug);
 
@@ -64,8 +67,9 @@ export function PlantDetail({ product }: { product: Product }) {
   );
 
   function handleAdd() {
-    add(product.slug);
+    add(product.slug, qty);
     setAdded(true);
+    setQty(1); // the picker is per-add, not a running total
     if (resetTimer.current) clearTimeout(resetTimer.current);
     resetTimer.current = setTimeout(() => setAdded(false), 1500);
   }
@@ -74,7 +78,7 @@ export function PlantDetail({ product }: { product: Product }) {
     <>
       <Backdrop />
       <TopNav />
-      <main className="mx-auto max-w-5xl px-4 pt-5 pb-36 md:pt-10 md:pb-16">
+      <main id="main" className="mx-auto max-w-5xl px-4 pt-5 pb-36 md:pt-10 md:pb-16">
         <div className="md:grid md:grid-cols-2 md:gap-10">
         {/* Image */}
         <div className="anim-bloom relative">
@@ -84,6 +88,7 @@ export function PlantDetail({ product }: { product: Product }) {
               alt={product.name}
               fill
               priority
+              {...blurProps(product.image)}
               sizes="(max-width: 768px) 100vw, 40rem"
               className="object-cover"
             />
@@ -167,6 +172,7 @@ export function PlantDetail({ product }: { product: Product }) {
             <span className="text-display text-3xl text-gold-300">
               {formatPrice(product.price)}
             </span>
+            <QuantityStepper qty={qty} onChange={(n) => setQty(Math.max(1, n))} />
             <PillButton onClick={handleAdd} className="flex-1 py-4">
               <span key={String(added)} className="anim-pop flex items-center gap-2">
                 {added ? (

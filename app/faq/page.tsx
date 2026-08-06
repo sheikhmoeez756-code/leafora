@@ -127,7 +127,7 @@ export default function FaqPage() {
     <>
       <Backdrop />
       <TopNav />
-      <main className="mx-auto max-w-5xl px-4 pt-8 pb-16 md:pt-12">
+      <main id="main" className="mx-auto max-w-5xl px-4 pt-8 pb-16 md:pt-12">
         <header className="anim-rise max-w-2xl">
           <p className="text-xs tracking-[0.18em] text-sage-400 uppercase">Help</p>
           <h1 className="text-display mt-2 text-4xl md:text-5xl">

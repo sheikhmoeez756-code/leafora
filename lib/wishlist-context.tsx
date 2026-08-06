@@ -40,6 +40,16 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
     dispatch({ type: "hydrate", slugs: parseStoredWishlist(raw) });
   }, []);
 
+  // Another tab changed the wishlist. `storage` only fires in *other* tabs.
+  useEffect(() => {
+    function onStorage(e: StorageEvent) {
+      if (e.key !== STORAGE_KEY) return;
+      dispatch({ type: "hydrate", slugs: parseStoredWishlist(e.newValue) });
+    }
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, []);
+
   useEffect(() => {
     if (!state.hydrated) return;
     try {

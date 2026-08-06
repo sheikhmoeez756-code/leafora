@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { formatPrice, getProduct } from "@/lib/products";
+import { blurProps } from "@/lib/blur-data";
 import { promoRate, useCart } from "@/lib/cart-context";
 import { BottomNav, TopNav } from "@/components/nav";
 import { Backdrop } from "@/components/backdrop";
@@ -23,6 +24,31 @@ export default function CartPage() {
   const cart = useCart();
   const [code, setCode] = useState("");
   const [promoState, setPromoState] = useState<"idle" | "ok" | "bad">("idle");
+  // Remembers the last removed line so it can be put back. Removal is one
+  // click and otherwise unrecoverable.
+  const [undo, setUndo] = useState<{ slug: string; qty: number } | null>(null);
+  const undoTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(
+    () => () => {
+      if (undoTimer.current) clearTimeout(undoTimer.current);
+    },
+    []
+  );
+
+  function removeWithUndo(slug: string, qty: number) {
+    cart.remove(slug);
+    setUndo({ slug, qty });
+    if (undoTimer.current) clearTimeout(undoTimer.current);
+    undoTimer.current = setTimeout(() => setUndo(null), 8000);
+  }
+
+  function restore() {
+    if (!undo) return;
+    cart.add(undo.slug, undo.qty);
+    setUndo(null);
+    if (undoTimer.current) clearTimeout(undoTimer.current);
+  }
 
   function applyPromo() {
     if (!code.trim()) return;
@@ -35,7 +61,7 @@ export default function CartPage() {
     <>
       <Backdrop />
       <TopNav />
-      <main className="mx-auto max-w-5xl px-4 pt-5 pb-28 md:pt-10 md:pb-16">
+      <main id="main" className="mx-auto max-w-5xl px-4 pt-5 pb-28 md:pt-10 md:pb-16">
         {/* Mobile header */}
         <header className="mb-6 flex items-center justify-between md:hidden">
           <button
@@ -49,6 +75,25 @@ export default function CartPage() {
           <span className="w-10" />
         </header>
         <h1 className="text-display mb-6 hidden text-3xl md:block">My Cart</h1>
+
+        {/* Sits above the empty-state branch: removing the last line empties the
+            cart, and that is exactly when undo matters most. */}
+        <div role="status" aria-live="polite">
+          {undo && (
+            <div className="glass anim-rise mb-4 flex items-center justify-between gap-4 rounded-2xl px-5 py-3 text-sm">
+              <span className="text-sage-200">
+                Removed {getProduct(undo.slug)?.name ?? "item"}
+                {undo.qty > 1 && ` (×${undo.qty})`}
+              </span>
+              <button
+                onClick={restore}
+                className="shrink-0 font-medium text-gold-300 transition hover:text-gold-400"
+              >
+                Undo
+              </button>
+            </div>
+          )}
+        </div>
 
         {cart.items.length === 0 ? (
           <GlassCard className="anim-bloom flex flex-col items-center gap-4 p-12 text-center">
@@ -78,6 +123,7 @@ export default function CartPage() {
                           src={p.image}
                           alt={p.name}
                           fill
+                          {...blurProps(p.image)}
                           sizes="80px"
                           className="object-cover"
                         />
@@ -94,7 +140,7 @@ export default function CartPage() {
                       <div className="flex flex-col items-end gap-2.5 pr-1">
                         <button
                           aria-label={`Remove ${p.name}`}
-                          onClick={() => cart.remove(slug)}
+                          onClick={() => removeWithUndo(slug, qty)}
                           className="text-sage-400 transition hover:text-cream-50"
                         >
                           <TrashIcon width={16} height={16} />
