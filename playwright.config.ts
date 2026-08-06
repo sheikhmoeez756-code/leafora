@@ -8,10 +8,17 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
+  // Next optimizes images on demand, and the catalogue photos are large. Too
+  // many workers requesting different images at once starves the optimizer and
+  // navigation starts timing out — a test-harness limit, not an app fault.
+  workers: 2,
+  timeout: 60_000,
   reporter: process.env.CI ? [["github"], ["html", { open: "never" }]] : "list",
   use: {
     baseURL: BASE_URL,
     trace: "on-first-retry",
+    actionTimeout: 15_000,
+    navigationTimeout: 30_000,
   },
   projects: [
     {

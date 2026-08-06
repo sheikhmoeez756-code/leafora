@@ -119,6 +119,12 @@ export function TopNav() {
             Plants
           </Link>
           <Link
+            href="/care"
+            className={pathname === "/care" ? "text-cream-50" : "hover:text-cream-50"}
+          >
+            Care
+          </Link>
+          <Link
             href="/wishlist"
             className={`relative ${pathname === "/wishlist" ? "text-cream-50" : "hover:text-cream-50"}`}
             aria-label="Wishlist"

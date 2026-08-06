@@ -7,6 +7,7 @@ import { useWishlist } from "@/lib/wishlist-context";
 import { ProductCard } from "@/components/product-card";
 import { BottomNav, TopNav } from "@/components/nav";
 import { Backdrop } from "@/components/backdrop";
+import { Footer } from "@/components/footer";
 import { GlassCard, PillLink } from "@/components/ui";
 import { ArrowLeftIcon, ArrowRightIcon, HeartIcon } from "@/components/icons";
 
@@ -84,6 +85,7 @@ export default function WishlistPage() {
           </>
         )}
       </main>
+      <Footer />
       <BottomNav />
     </>
   );
