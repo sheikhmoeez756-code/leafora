@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { blurProps } from "@/lib/blur-data";
 
 /** Fixed blurred-foliage background used by all store pages. */
 export function Backdrop() {
@@ -10,6 +11,7 @@ export function Backdrop() {
         src="/bg/leaves.jpg"
         alt=""
         fill
+        {...blurProps("/bg/leaves.jpg")}
         sizes="100vw"
         className="anim-drift scale-110 object-cover blur-md"
       />

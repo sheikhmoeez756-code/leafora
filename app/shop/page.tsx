@@ -20,7 +20,7 @@ export default function ShopPage() {
         <>
           <Backdrop />
           <TopNav />
-          <main className="mx-auto max-w-5xl px-4 pt-5 pb-28 md:pt-8">
+          <main id="main" className="mx-auto max-w-5xl px-4 pt-5 pb-28 md:pt-8">
             <div className="glass h-12 animate-pulse rounded-full" />
             <div className="glass mt-5 h-44 animate-pulse rounded-3xl" />
             <div className="mt-6 grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-5 lg:grid-cols-4">

@@ -4,7 +4,7 @@ import { ArrowRightIcon, LeafIcon } from "@/components/icons";
 
 export default function OnboardingPage() {
   return (
-    <main className="relative flex min-h-dvh items-center justify-center overflow-hidden p-5">
+    <main id="main" className="relative flex min-h-dvh items-center justify-center overflow-hidden p-5">
       <Image
         src="/bg/leaves.jpg"
         alt=""

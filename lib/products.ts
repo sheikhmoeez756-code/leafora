@@ -228,6 +228,38 @@ export function formatPrice(n: number): string {
   return `$${n.toFixed(2)}`;
 }
 
+export const SORTS = [
+  { key: "featured", label: "Featured" },
+  { key: "price-asc", label: "Price: low to high" },
+  { key: "price-desc", label: "Price: high to low" },
+  { key: "rating", label: "Top rated" },
+  { key: "name", label: "Name A–Z" },
+] as const;
+
+export type SortKey = (typeof SORTS)[number]["key"];
+
+export function isSortKey(value: string | null): value is SortKey {
+  return SORTS.some((s) => s.key === value);
+}
+
+/** Returns a new array — never sorts the caller's list in place. "featured"
+ *  preserves catalogue order, which is the curated one. */
+export function sortProducts(items: Product[], key: SortKey): Product[] {
+  const out = [...items];
+  switch (key) {
+    case "price-asc":
+      return out.sort((a, b) => a.price - b.price);
+    case "price-desc":
+      return out.sort((a, b) => b.price - a.price);
+    case "rating":
+      return out.sort((a, b) => b.rating - a.rating || b.reviews - a.reviews);
+    case "name":
+      return out.sort((a, b) => a.name.localeCompare(b.name));
+    case "featured":
+      return out;
+  }
+}
+
 /** Plants that genuinely suit the same spot: shared categories first, then a
  *  matching light requirement, with rating as the tie-break. Falls back to
  *  bestsellers so a product with no overlap still shows something useful. */

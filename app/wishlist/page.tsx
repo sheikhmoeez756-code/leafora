@@ -22,7 +22,7 @@ export default function WishlistPage() {
     <>
       <Backdrop />
       <TopNav />
-      <main className="mx-auto max-w-5xl px-4 pt-5 pb-28 md:pt-10 md:pb-16">
+      <main id="main" className="mx-auto max-w-5xl px-4 pt-5 pb-28 md:pt-10 md:pb-16">
         {/* Mobile header */}
         <header className="mb-6 flex items-center justify-between md:hidden">
           <button

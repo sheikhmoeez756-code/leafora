@@ -51,6 +51,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${marcellus.variable} ${inter.variable} antialiased`}>
+        <a href="#main" className="skip-link">
+          Skip to content
+        </a>
         <CartProvider>
           <WishlistProvider>{children}</WishlistProvider>
         </CartProvider>
