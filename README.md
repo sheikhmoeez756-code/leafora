@@ -5,9 +5,9 @@ A plant-shop e-commerce showcase with a dark forest-green, glassmorphism aesthet
 **Live demo → [plants-eosin.vercel.app](https://plants-eosin.vercel.app)**
 
 <p align="center">
-  <img src="docs/screenshots/onboarding.png" alt="Onboarding — Leafora, Bring Nature Home" width="260" />
-  <img src="docs/screenshots/shop.png" alt="Shop — search, promo banner, category chips, product grid" width="260" />
-  <img src="docs/screenshots/detail.png" alt="Product detail — care stats and add to cart" width="260" />
+  <img src="docs/screenshots/onboarding.jpg" alt="Onboarding — Leafora, Bring Nature Home" width="260" />
+  <img src="docs/screenshots/shop.jpg" alt="Shop — search, promo banner, category chips, product grid" width="260" />
+  <img src="docs/screenshots/detail.jpg" alt="Product detail — care stats and add to cart" width="260" />
 </p>
 
 ## Features
@@ -19,10 +19,10 @@ A plant-shop e-commerce showcase with a dark forest-green, glassmorphism aesthet
 - **CSS-only motion** — entrance cascades, a slow Ken Burns drift on the backdrop, floating logo, cart-badge pops. Fully disabled under `prefers-reduced-motion`.
 
 <p align="center">
-  <img src="docs/screenshots/desktop-shop.png" alt="Desktop shop layout" width="800" />
+  <img src="docs/screenshots/desktop-shop.jpg" alt="Desktop shop layout" width="800" />
 </p>
 <p align="center">
-  <img src="docs/screenshots/cart.png" alt="Cart with promo code applied" width="320" />
+  <img src="docs/screenshots/cart.jpg" alt="Cart with promo code applied" width="320" />
 </p>
 
 ## Stack
