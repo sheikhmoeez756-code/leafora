@@ -227,3 +227,32 @@ export function getProduct(slug: string): Product | undefined {
 export function formatPrice(n: number): string {
   return `$${n.toFixed(2)}`;
 }
+
+/** Plants that genuinely suit the same spot: shared categories first, then a
+ *  matching light requirement, with rating as the tie-break. Falls back to
+ *  bestsellers so a product with no overlap still shows something useful. */
+export function relatedProducts(slug: string, limit = 4): Product[] {
+  const product = getProduct(slug);
+  if (!product) return [];
+
+  const scored = PRODUCTS.filter((p) => p.slug !== slug)
+    .map((p) => {
+      const shared = p.categories.filter((c) =>
+        product.categories.includes(c)
+      ).length;
+      const sameLight = p.care.light === product.care.light ? 1 : 0;
+      const samePets = p.care.petFriendly === product.care.petFriendly ? 0.5 : 0;
+      return { p, score: shared * 2 + sameLight + samePets };
+    })
+    .sort((a, b) => b.score - a.score || b.p.rating - a.p.rating);
+
+  const related = scored.filter((s) => s.score > 0).map((s) => s.p);
+  if (related.length >= limit) return related.slice(0, limit);
+
+  // Top up with bestsellers rather than returning a thin row.
+  const filler = PRODUCTS.filter(
+    (p) => p.slug !== slug && !related.includes(p)
+  ).sort((a, b) => Number(b.bestseller) - Number(a.bestseller) || b.rating - a.rating);
+
+  return [...related, ...filler].slice(0, limit);
+}

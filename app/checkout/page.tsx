@@ -18,6 +18,27 @@ import {
 const inputCls =
   "glass w-full rounded-2xl px-4 py-3 text-sm outline-none placeholder:text-sage-400 focus:border-gold-400/50";
 
+/** Placeholders vanish once a field has content, so every input keeps a real
+ *  (visually hidden) label attached to it. */
+function Field({
+  id,
+  label,
+  className = "",
+  ...rest
+}: React.InputHTMLAttributes<HTMLInputElement> & {
+  id: string;
+  label: string;
+}) {
+  return (
+    <div className={className}>
+      <label htmlFor={id} className="sr-only">
+        {label}
+      </label>
+      <input id={id} placeholder={label} className={inputCls} {...rest} />
+    </div>
+  );
+}
+
 export default function CheckoutPage() {
   const router = useRouter();
   const cart = useCart();
@@ -95,29 +116,40 @@ export default function CheckoutPage() {
           {/* Delivery details */}
           <div className="anim-rise space-y-3">
             <h2 className="text-display px-1 text-lg">Delivery Details</h2>
-            <input required placeholder="Full name" className={inputCls} autoComplete="name" />
-            <input
-              required
+            <Field id="co-name" label="Full name" required autoComplete="name" />
+            <Field
+              id="co-email"
+              label="Email"
               type="email"
-              placeholder="Email"
-              className={inputCls}
+              required
               autoComplete="email"
             />
-            <input
+            <Field
+              id="co-street"
+              label="Street address"
               required
-              placeholder="Street address"
-              className={inputCls}
               autoComplete="street-address"
             />
             <div className="grid grid-cols-2 gap-3">
-              <input required placeholder="City" className={inputCls} autoComplete="address-level2" />
-              <input required placeholder="Postal code" className={inputCls} autoComplete="postal-code" />
+              <Field id="co-city" label="City" required autoComplete="address-level2" />
+              <Field
+                id="co-postal"
+                label="Postal code"
+                required
+                autoComplete="postal-code"
+              />
             </div>
-            <textarea
-              placeholder="Delivery notes (optional) — e.g. “leave with the neighbor’s ficus”"
-              rows={3}
-              className={`${inputCls} resize-none rounded-2xl`}
-            />
+            <div>
+              <label htmlFor="co-notes" className="sr-only">
+                Delivery notes (optional)
+              </label>
+              <textarea
+                id="co-notes"
+                placeholder="Delivery notes (optional) — e.g. “leave with the neighbor’s ficus”"
+                rows={3}
+                className={`${inputCls} resize-none rounded-2xl`}
+              />
+            </div>
           </div>
 
           {/* Order summary */}

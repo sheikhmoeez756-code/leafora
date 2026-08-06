@@ -61,18 +61,6 @@ body {
   letter-spacing: 0.01em;
 }
 
-/* Soft vignette over background photography */
-.bg-veil::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  background:
-    radial-gradient(120% 90% at 50% 0%, rgba(12, 20, 16, 0.25) 0%, rgba(12, 20, 16, 0.78) 78%),
-    linear-gradient(rgba(12, 20, 16, 0.35), rgba(12, 20, 16, 0.9));
-  pointer-events: none;
-  z-index: -1;
-}
-
 ::selection {
   background: var(--color-gold-400);
   color: var(--color-forest-950);

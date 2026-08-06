@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCart } from "@/lib/cart-context";
+import { useWishlist } from "@/lib/wishlist-context";
 import {
   CartIcon,
   GridIcon,
@@ -12,15 +13,30 @@ import {
   UserIcon,
 } from "@/components/icons";
 
-function CartBadge() {
+export function CartBadge({ className = "-top-1.5 -right-1.5" }: { className?: string }) {
   const { count } = useCart();
   if (!count) return null;
   return (
     <span
       key={count}
-      className="anim-pop absolute -top-1.5 -right-1.5 flex h-4.5 min-w-4.5 items-center justify-center rounded-full bg-gold-400 px-1 text-[10px] font-semibold text-forest-950"
+      className={`anim-pop absolute flex h-4.5 min-w-4.5 items-center justify-center rounded-full bg-gold-400 px-1 text-[10px] font-semibold text-forest-950 ${className}`}
     >
       {count}
+      <span className="sr-only"> items in cart</span>
+    </span>
+  );
+}
+
+function WishlistBadge({ className = "-top-1.5 -right-1.5" }: { className?: string }) {
+  const { count } = useWishlist();
+  if (!count) return null;
+  return (
+    <span
+      key={count}
+      className={`anim-pop absolute flex h-4.5 min-w-4.5 items-center justify-center rounded-full bg-gold-400 px-1 text-[10px] font-semibold text-forest-950 ${className}`}
+    >
+      {count}
+      <span className="sr-only"> plants saved</span>
     </span>
   );
 }
@@ -28,8 +44,8 @@ function CartBadge() {
 const tabs = [
   { href: "/shop", label: "Home", icon: HomeIcon },
   { href: "/shop#plants", label: "Plants", icon: GridIcon },
-  { href: "/cart", label: "Cart", icon: CartIcon, badge: true },
-  { href: "/wishlist", label: "Wishlist", icon: HeartIcon, disabled: true },
+  { href: "/cart", label: "Cart", icon: CartIcon, badge: "cart" as const },
+  { href: "/wishlist", label: "Wishlist", icon: HeartIcon, badge: "wishlist" as const },
   { href: "/profile", label: "Profile", icon: UserIcon, disabled: true },
 ];
 
@@ -41,25 +57,36 @@ export function BottomNav() {
       <ul className="flex items-center justify-around px-2 py-2.5">
         {tabs.map(({ href, label, icon: Icon, badge, disabled }) => {
           const active = pathname === href.split("#")[0] && label !== "Plants";
+          const cls = `flex flex-col items-center gap-0.5 px-2 text-[10px] transition-colors ${
+            active
+              ? "text-gold-300"
+              : disabled
+                ? "text-sage-400/40"
+                : "text-sage-300 hover:text-cream-50"
+          }`;
+          const inner = (
+            <>
+              <span className="relative">
+                <Icon width={22} height={22} />
+                {badge === "cart" && <CartBadge />}
+                {badge === "wishlist" && <WishlistBadge />}
+              </span>
+              {label}
+            </>
+          );
           return (
             <li key={label}>
-              <Link
-                href={disabled ? "#" : href}
-                aria-disabled={disabled}
-                className={`flex flex-col items-center gap-0.5 px-2 text-[10px] transition-colors ${
-                  active
-                    ? "text-gold-300"
-                    : disabled
-                      ? "text-sage-400/40"
-                      : "text-sage-300 hover:text-cream-50"
-                }`}
-              >
-                <span className="relative">
-                  <Icon width={22} height={22} />
-                  {badge && <CartBadge />}
+              {/* Unbuilt sections render as inert text — an href="#" link stays
+                  focusable and jumps to the top of the page when activated. */}
+              {disabled ? (
+                <span className={cls} aria-disabled title="Coming soon">
+                  {inner}
                 </span>
-                {label}
-              </Link>
+              ) : (
+                <Link href={href} className={cls}>
+                  {inner}
+                </Link>
+              )}
             </li>
           );
         })}
@@ -90,6 +117,20 @@ export function TopNav() {
             className="hover:text-cream-50"
           >
             Plants
+          </Link>
+          <Link
+            href="/care"
+            className={pathname === "/care" ? "text-cream-50" : "hover:text-cream-50"}
+          >
+            Care
+          </Link>
+          <Link
+            href="/wishlist"
+            className={`relative ${pathname === "/wishlist" ? "text-cream-50" : "hover:text-cream-50"}`}
+            aria-label="Wishlist"
+          >
+            <HeartIcon width={22} height={22} />
+            <WishlistBadge />
           </Link>
           <Link
             href="/cart"
